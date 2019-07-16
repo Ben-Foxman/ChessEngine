@@ -135,6 +135,7 @@ while not gameOver:
                             selectedPiece = piece
                             px = piece[1][0]
                             py = piece[1][1]
+                            break
 
 
 
@@ -164,21 +165,14 @@ while not gameOver:
                 # drawPieces()
                 newBoard = None
                 move = None
-                if legal:
-                    move = Move(chessBoard, selectedPiece, theMove)
-                    newBoard = move.makeMove()
-
-                friendlyKing = None
-                for tile in chessBoard.tiles.values():
-                    if (tile.pieceOnTile.toString() == "K" and chessBoard.currentPlayer == "Black") or (tile.pieceOnTile.toString() == "k" and chessBoard.currentPlayer == "White"):
-                        friendlyKing = tile.pieceOnTile
-                        break
-                if not legal or (selectedPiece[2].toString().lower() != "k" and friendlyKing.inCheck(newBoard, chessBoard)):
+                if not legal:
                     selectedPiece[1][0] = px
                     selectedPiece[1][1] = py
-                    # test for illegal moves to remove highlight on them
+
 
                 else:
+                    move = Move(chessBoard, selectedPiece, theMove)
+                    newBoard = move.makeMove()
                     selectedPiece[2].position = theMove
                     prevBoard = copy.deepcopy(chessBoard)
                     chessBoard = copy.deepcopy(newBoard)
