@@ -9,7 +9,7 @@ class Move:
     def __init__(self, board, piece, coordinate):
         self.board = board
         self.currentPlayer = board.currentPlayer
-        self.piece = piece[2]
+        self.piece = piece
         self.coordinate = coordinate
 
     def makeMove(self):

@@ -169,9 +169,8 @@ while not gameOver:
                     selectedPiece[1][0] = px
                     selectedPiece[1][1] = py
 
-
                 else:
-                    move = Move(chessBoard, selectedPiece, theMove)
+                    move = Move(chessBoard, selectedPiece[2], theMove)
                     newBoard = move.makeMove()
                     selectedPiece[2].position = theMove
                     prevBoard = copy.deepcopy(chessBoard)
