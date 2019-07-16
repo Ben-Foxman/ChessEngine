@@ -26,22 +26,25 @@ stalemate = p.USEREVENT + 2
 checkmateOccured = p.event.Event(checkmate)
 stalemateOccured = p.event.Event(stalemate)
 
+
 moveCounter = 1
 font = p.font.Font('freesansbold.ttf', 24)
+
+
 
 
 def drawPieces():
     xPos = 0
     yPos = 700
-    white = (100, 24, 211)
-    black = (167, 145 ,67)
+    white = (238, 238, 210)
+    black = (117, 149 ,86)
     highlight = (0, 255, 0)
     width = 100
     height = 100
     number = 0
     for x in range(8):
         for y in range(8):
-            if y % 2 == x % 2:
+            if y % 2 != x % 2:
                 drawSquares(xPos, yPos, width, height, white)
             else:
                 drawSquares(xPos, yPos, width, height, black)
@@ -91,11 +94,14 @@ px, py = 0, 0
 drawPieces()
 
 while not gameOver:
+
     for event in p.event.get():
         if event.type == p.QUIT:
             gameOver = True
             p.quit()
             quit()
+
+
 
         if event.type == checkmate:
             checkmateText1 = font.render(("Checkmate!"), True, (143, 32, 67))
@@ -134,9 +140,10 @@ while not gameOver:
 
 
         if event.type == p.MOUSEMOTION and selectedPiece:
-            mx, my = p.mouse.get_pos()
+            mx, my = event.pos
             selectedPiece[1][0] = mx - 50
             selectedPiece[1][1] = my - 50
+
 
 
         if event.type == p.MOUSEBUTTONUP and selectedPiece:
@@ -196,13 +203,14 @@ while not gameOver:
                         moveCounter += 1
                     print(evalBoard(chessBoard))
                 selectedPiece = None
+
     for tile in allTiles:
         p.draw.rect(game, tile[0], tile[1])
     for img in allPieces:
         game.blit(img[0], img[1])
     p.display.update()
     clock.tick(60)
-    print(clock.get_fps())
     if moveCounter == 3:
         pass
+
 
