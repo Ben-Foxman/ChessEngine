@@ -9,6 +9,4 @@ class Piece:
     def toString(self):
         pass
 
-    def __eq__(self, other):
-        if isinstance(other, Piece):
-            return
+

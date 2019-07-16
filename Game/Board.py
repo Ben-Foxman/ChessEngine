@@ -9,7 +9,6 @@ from Pieces.Knight import Knight
 
 class Board:
     def __init__(self):
-        pass
         self.currentPlayer = "White"
         self.tiles = dict()
         for x in range(64):

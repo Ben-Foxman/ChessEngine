@@ -8,7 +8,6 @@ import copy
 class Move:
     def __init__(self, board, piece, coordinate):
         self.board = board
-        self.currentPlayer = board.currentPlayer
         self.piece = piece
         self.coordinate = coordinate
 

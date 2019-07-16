@@ -6,6 +6,7 @@ import math
 import copy
 import time
 from Pieces.NullPiece import NullPiece
+from Game.Tile import Tile
 
 p.init()
 game = p.display.set_mode((1000, 800))
@@ -163,12 +164,22 @@ while not gameOver:
 
 
                 # drawPieces()
-                newBoard = None
-                move = None
-                if not legal:
+
+
+                if legal:
+                    move = Move(chessBoard, selectedPiece[2], theMove)
+                    newBoard = move.makeMove()
+
+                friendlyKing = None
+                for tile in chessBoard.tiles.values():
+                    if (tile.pieceOnTile.toString() == "K" and chessBoard.currentPlayer == "Black") or (
+                            tile.pieceOnTile.toString() == "k" and chessBoard.currentPlayer == "White"):
+                        friendlyKing = tile.pieceOnTile
+                        break
+                if not legal or (
+                        selectedPiece[2].toString().lower() != "k" and friendlyKing.inCheck(newBoard, chessBoard)):
                     selectedPiece[1][0] = px
                     selectedPiece[1][1] = py
-
                 else:
                     move = Move(chessBoard, selectedPiece[2], theMove)
                     newBoard = move.makeMove()
@@ -176,6 +187,8 @@ while not gameOver:
                     prevBoard = copy.deepcopy(chessBoard)
                     chessBoard = copy.deepcopy(newBoard)
                     allPieces = updateChessPieces()
+                    prevBoard.printBoard()
+                    chessBoard.printBoard()
                     for piece in allPieces:
                         if piece[2].color != chessBoard.currentPlayer and piece[2].toString().lower() == "k":
                             if piece[2].inCheck(chessBoard, prevBoard):
