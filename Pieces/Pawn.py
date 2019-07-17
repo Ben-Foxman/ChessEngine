@@ -19,8 +19,8 @@ class Pawn(Piece):
                 if board.tiles[self.position + 7].pieceOnTile.toString() != "-" and \
                         board.tiles[self.position + 7].pieceOnTile.color != self.color and self.position % 8 != 0:
                     destinations.append(self.position + 7)
-                if board.tiles[self.position + 9].pieceOnTile.toString() != "-" and \
-                        board.tiles[self.position + 9].pieceOnTile.color != self.color and self.position % 8 != 7:
+                if self.position % 8 != 7 and board.tiles[self.position + 9].pieceOnTile.toString() != "-" and \
+                         board.tiles[self.position + 9].pieceOnTile.color != self.color:
                     destinations.append(self.position + 9)
 
             elif 16 <= self.position < 56:
@@ -46,8 +46,8 @@ class Pawn(Piece):
                 if board.tiles[self.position + 7].pieceOnTile.toString() != "-" and \
                         board.tiles[self.position + 7].pieceOnTile.color != self.color and self.position % 8 != 0:
                     destinations.append(self.position + 7)
-                if board.tiles[self.position + 9].pieceOnTile.toString() != "-" and \
-                        board.tiles[self.position + 9].pieceOnTile.color != self.color and self.position % 8 != 7:
+                if self.position % 8 != 7 and board.tiles[self.position + 9].pieceOnTile.toString() != "-" and \
+                         board.tiles[self.position + 9].pieceOnTile.color != self.color:
                     destinations.append(self.position + 9)
                 if board.tiles[self.position + 8].pieceOnTile.toString() == "-":
                     destinations.append(self.position + 8)
@@ -92,8 +92,8 @@ class Pawn(Piece):
                 if board.tiles[self.position - 7].pieceOnTile.toString() != "-" and \
                         board.tiles[self.position - 7].pieceOnTile.color != self.color and self.position % 8 != 7:
                     destinations.append(self.position - 7)
-                if board.tiles[self.position - 9].pieceOnTile.toString() != "-" and \
-                        board.tiles[self.position - 9].pieceOnTile.color != self.color and self.position % 8 != 0:
+                if self.position % 8 != 0 and board.tiles[self.position - 9].pieceOnTile.toString() != "-" and \
+                        board.tiles[self.position - 9].pieceOnTile.color != self.color:
                     destinations.append(self.position - 9)
                 if board.tiles[self.position - 8].pieceOnTile.toString() == "-":
                     destinations.append(self.position - 8)
@@ -105,7 +105,7 @@ class Pawn(Piece):
             if 8 <= self.position < 56:
                 if board.tiles[self.position + 7].pieceOnTile.color != self.color and self.position % 8 != 0:
                     destinations.append(self.position + 7)
-                if board.tiles[self.position + 9].pieceOnTile.color != self.color and self.position % 8 != 7:
+                if self.position % 8 != 7 and board.tiles[self.position + 9].pieceOnTile.color != self.color:
                     destinations.append(self.position + 9)
 
                 # en passant check
@@ -134,7 +134,7 @@ class Pawn(Piece):
             if 8 <= self.position < 56:
                 if board.tiles[self.position - 7].pieceOnTile.color != self.color and self.position % 8 != 7:
                     destinations.append(self.position - 7)
-                if board.tiles[self.position - 9].pieceOnTile.color != self.color and self.position % 8 != 0:
+                if self.position % 8 != 0 and board.tiles[self.position - 9].pieceOnTile.color != self.color:
                     destinations.append(self.position - 9)
 
                 if 24 <= self.position < 31:
