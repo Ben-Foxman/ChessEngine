@@ -29,7 +29,7 @@ checkmateOccured = p.event.Event(checkmate)
 stalemateOccured = p.event.Event(stalemate)
 
 
-moveCounter = 1
+
 font = p.font.Font('freesansbold.ttf', 24)
 
 
@@ -144,7 +144,8 @@ while not gameOver:
 
         if event.type == p.MOUSEMOTION and selectedPiece:
             mx, my = event.pos
-            selectedPiece[1][0] = mx - 50
+            if mx < 770:
+                selectedPiece[1][0] = mx - 50
             selectedPiece[1][1] = my - 50
 
 
@@ -190,15 +191,18 @@ while not gameOver:
                     prevBoard = copy.deepcopy(chessBoard)
                     chessBoard = copy.deepcopy(newBoard)
                     allPieces = updateChessPieces()
+                    print(evalBoard(chessBoard))
+                    print(chessBoard.moveCounter)
 
 
+                    #post selection
                     if chessBoard.currentPlayer == "White":
                         chessBoard.currentPlayer = "Black"
                         chessBoard.previousPlayer = "White"
                     else:
                         chessBoard.currentPlayer = "White"
                         chessBoard.previousPlayer = "Black"
-                        moveCounter += 1
+                        chessBoard.moveCounter += 1
 
                     for piece in allPieces:
                         if piece[2].color == chessBoard.currentPlayer and piece[2].toString().lower() == "k":
@@ -221,7 +225,5 @@ while not gameOver:
         game.blit(img[0], img[1])
     p.display.update()
     clock.tick(60)
-    if moveCounter == 3:
-        pass
 
 

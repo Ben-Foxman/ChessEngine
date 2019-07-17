@@ -11,6 +11,7 @@ class Board:
     def __init__(self):
         self.currentPlayer = "White"
         self.tiles = dict()
+        self.moveCounter = 1
         for x in range(64):
             self.tiles[x] = (Tile(x, NullPiece()))
         for x in range(8, 16):
