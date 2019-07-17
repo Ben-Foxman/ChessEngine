@@ -42,3 +42,15 @@ class Board:
                 print("|", end=self.tiles[8 * (7 - x) + y].pieceOnTile.toString())
             print("|")
 
+    def allEnemyAttacks(self, prevBoard):
+        allEnemyAttacks = []
+        for tile in self.tiles.values():
+            if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color != self.currentPlayer:
+                if tile.pieceOnTile.toString().lower() == "k":
+                    allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.rawMoves(self, prevBoard)
+                elif tile.pieceOnTile.legalMoves(self, prevBoard) is not None:
+                    if tile.pieceOnTile.toString().lower() == "p":
+                        allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.possibleCaptures(self, prevBoard)
+                    else:
+                        allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.legalMoves(self, prevBoard)
+        return allEnemyAttacks

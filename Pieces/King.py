@@ -137,11 +137,8 @@ class King(Piece):
 
         startingCoordinate = self.position
         destinations = list(filter(lambda x: x != startingCoordinate, destinations))
-        allEnemyAttacks = []
-        for tile in board.tiles.values():
-            if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color != self.color and tile.pieceOnTile.toString().lower() != "k":
-                if tile.pieceOnTile.legalMoves(board, prevBoard) is not None:
-                    allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.legalMoves(board, prevBoard)
+        allEnemyAttacks = board.allEnemyAttacks(prevBoard)
+
 
         # deal with castling
         if self.moved == False:
@@ -178,49 +175,181 @@ class King(Piece):
         moves = finalMoves
         for move in moves:
             copyBoard = copy.deepcopy(board)
-            allEnemyAttacks = []
             copyBoard.tiles[move] = Tile(move, NullPiece())
-            for tile in copyBoard.tiles.values():
-                if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color != self.color and tile.pieceOnTile.toString().lower() != "k":
-                    if tile.pieceOnTile.legalMoves(copyBoard, prevBoard) is not None:
-                        allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.legalMoves(copyBoard, prevBoard)
+            allEnemyAttacks = copyBoard.allEnemyAttacks(prevBoard)
             if move in allEnemyAttacks:
                 moves.remove(move)
         return moves
+    def rawMoves(self, board, prevBoard):
+        destinations = []
+        startingCoordinate = self.position
+        # Up Left
+        while 0 <= startingCoordinate < 56:
+            if startingCoordinate % 8 == 0:
+                break
+            else:
+                startingCoordinate += 7
+                if board.tiles[startingCoordinate].pieceOnTile.toString() == "-":
+                    destinations.append(startingCoordinate)
+                    break
+                elif board.tiles[startingCoordinate].pieceOnTile.color != self.color:
+                    destinations.append(startingCoordinate)
+                    break
+                else:
+                    break
 
+        startingCoordinate = self.position
+        # Down Left
+        while 9 <= startingCoordinate < 64:
+            if startingCoordinate % 8 == 0:
+                break
+            else:
+                startingCoordinate -= 9
+                if board.tiles[startingCoordinate].pieceOnTile.toString() == "-":
+                    destinations.append(startingCoordinate)
+                    break
+                elif board.tiles[startingCoordinate].pieceOnTile.color != self.color:
+                    destinations.append(startingCoordinate)
+                    break
+                else:
+                    break
+
+        startingCoordinate = self.position
+        # Up Right
+        while 0 <= startingCoordinate < 55:
+            if startingCoordinate % 8 == 7:
+                break
+            else:
+                startingCoordinate += 9
+                if board.tiles[startingCoordinate].pieceOnTile.toString() == "-":
+                    destinations.append(startingCoordinate)
+                    break
+                elif board.tiles[startingCoordinate].pieceOnTile.color != self.color:
+                    destinations.append(startingCoordinate)
+                    break
+                else:
+                    break
+
+        startingCoordinate = self.position
+        # Down Right
+        while 8 <= startingCoordinate < 64:
+            if startingCoordinate % 8 == 7:
+                break
+            else:
+                startingCoordinate -= 7
+                if board.tiles[startingCoordinate].pieceOnTile.toString() == "-":
+                    destinations.append(startingCoordinate)
+                    break
+                elif board.tiles[startingCoordinate].pieceOnTile.color != self.color:
+                    destinations.append(startingCoordinate)
+                    break
+                else:
+                    break
+
+        startingCoordinate = self.position
+        # Up
+        while 0 <= startingCoordinate < 56:
+            startingCoordinate += 8
+            if board.tiles[startingCoordinate].pieceOnTile.toString() == "-":
+                destinations.append(startingCoordinate)
+                break
+            elif board.tiles[startingCoordinate].pieceOnTile.color != self.color:
+                destinations.append(startingCoordinate)
+                break
+            else:
+                break
+
+        startingCoordinate = self.position
+        # Down
+        while 8 <= startingCoordinate < 64:
+            startingCoordinate -= 8
+            if board.tiles[startingCoordinate].pieceOnTile.toString() == "-":
+                destinations.append(startingCoordinate)
+                break
+            elif board.tiles[startingCoordinate].pieceOnTile.color != self.color:
+                destinations.append(startingCoordinate)
+                break
+            else:
+                break
+
+        startingCoordinate = self.position
+        # Right
+        while 0 <= startingCoordinate < 63:
+            if startingCoordinate % 8 == 7:
+                break
+            else:
+                startingCoordinate += 1
+                if board.tiles[startingCoordinate].pieceOnTile.toString() == "-":
+                    destinations.append(startingCoordinate)
+                    break
+                elif board.tiles[startingCoordinate].pieceOnTile.color != self.color:
+                    destinations.append(startingCoordinate)
+                    break
+                else:
+                    break
+
+        startingCoordinate = self.position
+        # Left
+        while 1 <= startingCoordinate < 64:
+            if startingCoordinate % 8 == 0:
+                break
+            else:
+                startingCoordinate -= 1
+                if board.tiles[startingCoordinate].pieceOnTile.toString() == "-":
+                    destinations.append(startingCoordinate)
+                    break
+                elif board.tiles[startingCoordinate].pieceOnTile.color != self.color:
+                    destinations.append(startingCoordinate)
+                    break
+                else:
+                    break
+
+        startingCoordinate = self.position
+        destinations = list(filter(lambda x: x != startingCoordinate, destinations))
+
+        return destinations
     def inCheck(self, board, prevBoard):
-        allEnemyAttacks = []
-        for tile in board.tiles.values():
-            if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color != self.color and tile.pieceOnTile.toString().lower() != "k":
-                if tile.pieceOnTile.legalMoves(board, prevBoard) is not None:
-                    allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.legalMoves(board, prevBoard)
+        allEnemyAttacks = board.allEnemyAttacks(prevBoard)
         return self.position in allEnemyAttacks
 
     def inCheckmate(self, board, prevBoard):
         moves = self.legalMoves(board, prevBoard)
         for move in moves:
             copyBoard = copy.deepcopy(board)
-            allEnemyAttacks = []
             copyBoard.tiles[move] = Tile(move, NullPiece())
-            for tile in copyBoard.tiles.values():
-                if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color != self.color and tile.pieceOnTile.toString().lower() != "k":
-                    if tile.pieceOnTile.legalMoves(copyBoard, prevBoard) is not None:
-                        allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.legalMoves(copyBoard, prevBoard)
+            allEnemyAttacks = copyBoard.allEnemyAttacks(prevBoard)
             if move in allEnemyAttacks:
                 moves.remove(move)
 
         allFriendlyMoves = []
+        allFriendlyPieces = []
         for tile in board.tiles.values():
-            if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color == self.color and tile.pieceOnTile.toString().lower() != "k":
+            if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color == self.color:
+                if tile.pieceOnTile.toString().lower() != "k":
+                    allFriendlyPieces.append(tile.pieceOnTile)
                 if tile.pieceOnTile.legalMoves(board, prevBoard) is not None:
                     allFriendlyMoves = allFriendlyMoves + tile.pieceOnTile.legalMoves(board, prevBoard)
+
+
+        for piece in allFriendlyPieces:
+            legalMoves = piece.legalMoves(board, prevBoard)
+            if legalMoves is not None:
+                for move in legalMoves:
+                    copyBoard = copy.deepcopy(board)
+                    copyBoard.tiles[piece.position] = Tile(piece.position, NullPiece())
+                    copyBoard.tiles[move] = Tile(move, piece)
+                    if not self.inCheck(copyBoard, board):
+                        return False
+
         copyBoard = copy.deepcopy(board)
+
         for number in allFriendlyMoves:
-            if copyBoard.tiles[number].pieceOnTile.toString() != "-" and copyBoard.tiles[number].pieceOnTile.color != self.color:
+            if copyBoard.tiles[number].pieceOnTile.color != self.color:
                 copyBoard.tiles[number] = Tile(number, NullPiece())
 
 
-        return not moves and self.inCheck(board, prevBoard) and self.inCheck(copyBoard, prevBoard)
+        copyBoard.printBoard()
+        return not moves and self.inCheck(copyBoard, board) # and self.inCheck(copyBoard, prevBoard)
 
 
 

@@ -5,6 +5,7 @@ from Engine.BoardEvaluator import evalBoard
 import math
 import copy
 import time
+from Pieces.Pawn import Pawn
 from Pieces.NullPiece import NullPiece
 from Game.Tile import Tile
 
@@ -165,10 +166,11 @@ while not gameOver:
 
                 # drawPieces()
 
-
+                hold = selectedPiece[2].position
                 if legal:
                     move = Move(chessBoard, selectedPiece[2], theMove)
                     newBoard = move.makeMove()
+                    selectedPiece[2].position = theMove
 
                 friendlyKing = None
                 for tile in chessBoard.tiles.values():
@@ -176,22 +178,32 @@ while not gameOver:
                             tile.pieceOnTile.toString() == "k" and chessBoard.currentPlayer == "White"):
                         friendlyKing = tile.pieceOnTile
                         break
-                if not legal or (
-                        selectedPiece[2].toString().lower() != "k" and friendlyKing.inCheck(newBoard, chessBoard)):
+                # print("Current Turn:",chessBoard.currentPlayer)
+                # print("Move is Legal:", legal)
+                # print("Move results in friendly king being in check:", friendlyKing.inCheck(newBoard, chessBoard))
+                # newBoard.printBoard()
+                if not legal or (friendlyKing.inCheck(newBoard, chessBoard)):
                     selectedPiece[1][0] = px
                     selectedPiece[1][1] = py
+                    selectedPiece[2].position = hold
                 else:
-                    move = Move(chessBoard, selectedPiece[2], theMove)
-                    newBoard = move.makeMove()
-                    selectedPiece[2].position = theMove
                     prevBoard = copy.deepcopy(chessBoard)
                     chessBoard = copy.deepcopy(newBoard)
                     allPieces = updateChessPieces()
-                    prevBoard.printBoard()
-                    chessBoard.printBoard()
+
+
+                    if chessBoard.currentPlayer == "White":
+                        chessBoard.currentPlayer = "Black"
+                        chessBoard.previousPlayer = "White"
+                    else:
+                        chessBoard.currentPlayer = "White"
+                        chessBoard.previousPlayer = "Black"
+                        moveCounter += 1
+
                     for piece in allPieces:
-                        if piece[2].color != chessBoard.currentPlayer and piece[2].toString().lower() == "k":
+                        if piece[2].color == chessBoard.currentPlayer and piece[2].toString().lower() == "k":
                             if piece[2].inCheck(chessBoard, prevBoard):
+                                print("Check")
                                 if piece[2].inCheckmate(chessBoard, prevBoard):
                                     p.event.post(checkmateOccured)
                                     break
@@ -200,14 +212,7 @@ while not gameOver:
                                 p.event.post(stalemateOccured)
                                 break
                             break
-                    if chessBoard.currentPlayer == "White":
-                        chessBoard.currentPlayer = "Black"
-                        chessBoard.previousPlayer = "White"
-                    else:
-                        chessBoard.currentPlayer = "White"
-                        chessBoard.previousPlayer = "Black"
-                        moveCounter += 1
-                    print(evalBoard(chessBoard))
+
                 selectedPiece = None
 
     for tile in allTiles:
