@@ -190,11 +190,10 @@ while not gameOver:
                 else:
                     prevBoard = copy.deepcopy(chessBoard)
                     chessBoard = copy.deepcopy(newBoard)
+                    chessBoard.prevBoard = copy.deepcopy(prevBoard)
                     allPieces = updateChessPieces()
-                    print(evalBoard(chessBoard))
-                    print(chessBoard.moveCounter)
-
-
+                    chessBoard.prevBoard.printBoard()
+                    print(round(evalBoard(chessBoard), 2))
                     #post selection
                     if chessBoard.currentPlayer == "White":
                         chessBoard.currentPlayer = "Black"
@@ -207,7 +206,6 @@ while not gameOver:
                     for piece in allPieces:
                         if piece[2].color == chessBoard.currentPlayer and piece[2].toString().lower() == "k":
                             if piece[2].inCheck(chessBoard, prevBoard):
-                                print("Check")
                                 if piece[2].inCheckmate(chessBoard, prevBoard):
                                     p.event.post(checkmateOccured)
                                     break
@@ -216,7 +214,6 @@ while not gameOver:
                                 p.event.post(stalemateOccured)
                                 break
                             break
-
                 selectedPiece = None
 
     for tile in allTiles:

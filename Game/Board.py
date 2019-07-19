@@ -12,6 +12,7 @@ class Board:
         self.currentPlayer = "White"
         self.tiles = dict()
         self.moveCounter = 1
+        self.prevBoard = None
         for x in range(64):
             self.tiles[x] = (Tile(x, NullPiece()))
         for x in range(8, 16):
@@ -55,3 +56,16 @@ class Board:
                     else:
                         allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.legalMoves(self, prevBoard)
         return allEnemyAttacks
+
+    def allFriendlyAttacks(self, prevBoard):
+        allFriendlyAttacks = []
+        for tile in self.tiles.values():
+            if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color == self.currentPlayer:
+                if tile.pieceOnTile.toString().lower() == "k":
+                    allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.rawMoves(self, prevBoard)
+                elif tile.pieceOnTile.legalMoves(self, prevBoard) is not None:
+                    if tile.pieceOnTile.toString().lower() == "p":
+                        allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.possibleCaptures(self, prevBoard)
+                    else:
+                        allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.legalMoves(self, prevBoard)
+        return allFriendlyAttacks
