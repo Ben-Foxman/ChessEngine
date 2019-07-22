@@ -5,6 +5,7 @@ from Engine.BoardEvaluator import newEvaluation
 from Pieces.Pawn import Pawn
 from Pieces.NullPiece import NullPiece
 from Pieces.Knight import Knight
+from Pieces.Queen import Queen
 import time
 import copy
 
@@ -48,6 +49,8 @@ def assignValues(node):
 
 nodes = {}
 x = 0
+
+
 def generateChildren(node):
     x = 0
     pieces = node.position.allFriendlyPieces()
@@ -55,26 +58,25 @@ def generateChildren(node):
         for move in piece.legalMoves(node.position):
             m = Move(node.position, piece, move)
             newBoard = copy.deepcopy(m.makeMove())
-            for tile in newBoard.tiles.values():
-                if move == tile.coordinate:
-                    tile.pieceOnTile.position = copy.deepcopy(piece)
-                    tile.pieceOnTile.position = move
+            if not newBoard == False:
+                for tile in newBoard.tiles.values():
+                    if move == tile.coordinate:
+                        tile.pieceOnTile.position = copy.deepcopy(piece)
+                        tile.pieceOnTile.position = move
 
-                    break
-            if node.position.currentPlayer == "White":
-                newBoard.currentPlayer = "Black"
-                newBoard.prevBoard = node.position
-                newBoard.prevBoard.currentPlayer = "White"
-                newNode = Node(newBoard, False)
-                node.addChild(newNode)
-            else:
-                newBoard.currentPlayer = "White"
-                newBoard.prevBoard = node.position
-                newBoard.prevBoard.currentPlayer = "Black"
-                newBoard.moveCounter += 1
-                newNode = Node(newBoard, True)
-                node.addChild(newNode)
-
+                        break
+                if node.position.currentPlayer == "White":
+                    newBoard.currentPlayer = "Black"
+                    newBoard.prevBoard = node.position
+                    newBoard.prevBoard.currentPlayer = "White"
+                    newNode = Node(newBoard, False)
+                    node.addChild(newNode)
+                else:
+                    newBoard.currentPlayer = "White"
+                    newBoard.prevBoard = node.position
+                    newBoard.prevBoard.currentPlayer = "Black"
+                    newNode = Node(newBoard, True)
+                    node.addChild(newNode)
 
 
 
@@ -94,10 +96,12 @@ def generateTree(node, depth):
 
 
 def getBestMove(node, depth):
+    x = 0
     generateTree(node, depth)
     assignValues(node)
     bestMove = [None, None]
     for child in node.children:
+        x += 1
         if node.max:
             if not bestMove[1] or child.value > bestMove[1]:
                 bestMove[0] = child.position
@@ -106,7 +110,7 @@ def getBestMove(node, depth):
             if not bestMove[1] or child.value < bestMove[1]:
                 bestMove[0] = child.position
                 bestMove[1] = child.value
-    # print(len(nodes))
+    # print(x)
     return bestMove
 
 def getNewBoard(board):
@@ -115,22 +119,27 @@ def getNewBoard(board):
     else:
         node = Node(board, False)
     # node.toString()
-    x = getBestMove(node, 1)
+    x = getBestMove(node, 2)
     newBoard = x[0]
+    if newBoard.currentPlayer == "White":
+        newBoard.currentPlayer = "Black"
+        newBoard.prevBoard.currentPlayer = "White"
+    else:
+        newBoard.currentPlayer = "White"
+        newBoard.prevBoard.currentPlayer = "Black"
     return newBoard
 
 #testing
 
 # b = BoardEvaluator(b)
-
 b = Board()
-b.tiles[28] = (Tile(28, Pawn("White", 28)))
-#b.tiles[36] = (Tile(36, Pawn("Black", 36)))
-#b.tiles[52] = (Tile(52, NullPiece()))
-b.tiles[12] = (Tile(12, NullPiece()))
-#b.tiles[21] = (Tile(21, Knight("White", 21)))
-#b.tiles[6] = (Tile(6, NullPiece()))
-#b.currentPlayer = "Black"
+b.tiles[39] = (Tile(39, Queen("White", 39)))
+b.tiles[36] = (Tile(36, Pawn("Black", 36)))
+b.tiles[52] = (Tile(52, NullPiece()))
+b.tiles[53] = (Tile(53, NullPiece()))
+b.tiles[21] = (Tile(21, Knight("White", 21)))
+b.tiles[6] = (Tile(6, NullPiece()))
+b.currentPlayer = "Black"
 
         # newBoard.printBoard()
 
@@ -143,4 +152,4 @@ b.tiles[12] = (Tile(12, NullPiece()))
 
 #print(len(nodes))
 #a[0].printBoard()
-#print()
+#print(a[0].currentPlayer, a[0].moveCounter)

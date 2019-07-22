@@ -165,9 +165,9 @@ class BoardEvaluator:
         if self.isOpening():
             for queen in self.queens:
                 if queen.color == "White" and queen.position % 8 not in [0, 1]:
-                    eval -= .4
+                    eval -= 1.3
                 elif queen.color == "Black" and queen.position % 8 not in [6, 7]:
-                    eval += .4
+                    eval += 1.3
         return eval
     
     

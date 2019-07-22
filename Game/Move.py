@@ -8,7 +8,7 @@ import copy
 class Move:
     def __init__(self, board, piece, coordinate):
         self.board = board
-        self.piece = piece
+        self.piece = copy.deepcopy(piece)
         self.coordinate = coordinate
 
     def makeMove(self):
@@ -74,6 +74,7 @@ class Move:
                 specialMove = True
 
         if not specialMove:
+            self.piece.position = self.coordinate
             boardCopy.tiles[self.coordinate] = Tile(self.coordinate, self.piece)
 
         friendlyKing = None

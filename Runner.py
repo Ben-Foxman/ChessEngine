@@ -15,7 +15,7 @@ game = p.display.set_mode((1000, 800))
 p.display.set_caption("Chess!")
 clock = p.time.Clock()
 
-
+aiTurn = False
 selectedPiece = None
 chessBoard = Board()
 allTiles = []
@@ -23,9 +23,11 @@ allPieces = []
 checkmate = p.USEREVENT + 1
 stalemate = p.USEREVENT + 2
 aiMove = p.USEREVENT + 3
+resolve = p.USEREVENT + 4
 checkmateOccured = p.event.Event(checkmate)
 stalemateOccured = p.event.Event(stalemate)
 aiMoves = p.event.Event(aiMove)
+resolvedBoard = p.event.Event(resolve)
 
 
 
@@ -104,9 +106,9 @@ while not gameOver:
 
 
         if event.type == checkmate:
-            checkmateText1 = font.render(("Checkmate!"), True, (143, 32, 67))
+            checkmateText1 = font.render(("Checkmate!"), True, (0, 255, 0))
 
-            checkmateText2 = font.render((str(chessBoard.currentPlayer) + " Wins!"), True, (143, 32, 67))
+            checkmateText2 = font.render((str(chessBoard.prevBoard.currentPlayer) + " Wins!"), True, (143, 32, 67))
             checkmateRect1 = checkmateText1.get_rect()
             checkmateRect2 = checkmateText2.get_rect()
             checkmateRect1.center = (900, 100)
@@ -120,21 +122,25 @@ while not gameOver:
 
 
         if event.type == stalemate:
-            stalemateText = font.render(("Stalemate!"), True, (143, 32, 67))
+            stalemateText = font.render(("Stalemate!"), True, (0, 255, 0))
             stalemateRect = stalemateText.get_rect()
             stalemateRect.center = (900, 100)
             game.blit(stalemateText, stalemateRect)
 
 
         if event.type == aiMove:
+            start = time.time()
             # chessBoard.printBoard()
                     # print(move)
             #print("The Chess Board")
             #chessBoard.printBoard()
             prevBoard = chessBoard
+
             # x = 0
 
             chessBoard = getNewBoard(chessBoard)
+            if chessBoard.prevBoard.prevBoard:
+                del chessBoard.prevBoard.prevBoard
             chessBoard.prevBoard = copy.deepcopy(prevBoard)
             allPieces = updateChessPieces()
             #chessBoard.prevBoard.printBoard()
@@ -142,8 +148,10 @@ while not gameOver:
 
             # print("Move Counter: " ,chessBoard.moveCounter)
             # print("Current Player: " ,chessBoard.currentPlayer)
-
-
+            print("Time for AI to move:",  time.time() - start)
+            #if chessBoard.moveCounter == 30:
+                #print()
+            p.event.post(resolvedBoard)
 
 
 
@@ -199,6 +207,8 @@ while not gameOver:
                     newBoard = move.makeMove()
                     if not newBoard == False:
                         prevBoard = chessBoard
+                        if prevBoard.prevBoard:
+                            del prevBoard.prevBoard
                         for tile in prevBoard.tiles.values():
                             if selectedPiece[2].position == tile.coordinate:
                                 tile.pieceOnTile = copy.deepcopy(selectedPiece[2])
@@ -207,49 +217,50 @@ while not gameOver:
                         chessBoard = newBoard
                         chessBoard.prevBoard = copy.deepcopy(prevBoard)
                         allPieces = updateChessPieces()
-                        if chessBoard.moveCounter == 3:
-                            print()
+                        p.event.post(resolvedBoard)
+
                         #prevPiece = selectedPiece
                         #selectedPiece[2].position = hold
 
-
-
-
-
-
-
-
-
                         #post selection
-                        if chessBoard.currentPlayer == "White":
-                            chessBoard.currentPlayer = "Black"
-                            chessBoard.prevBoard.currentPlayer = "White"
-                            p.event.post(aiMoves)
-                        else:
-                            chessBoard.currentPlayer = "White"
-                            chessBoard.prevBoard.currentPlayer = "Black"
-                            chessBoard.moveCounter += 1
 
-                        for piece in allPieces:
-                            if piece[2].color == chessBoard.currentPlayer and piece[2].toString().lower() == "k":
-                                if piece[2].inCheck(chessBoard):
-                                    if piece[2].inCheckmate(chessBoard):
-                                        p.event.post(checkmateOccured)
-                                        break
-
-                                elif piece[2].inStalemate(chessBoard):
-                                    p.event.post(stalemateOccured)
-                                    break
-                                break
-
-
+                    else:
+                        selectedPiece[1][0] = px
+                        selectedPiece[1][1] = py
                     selectedPiece = None
+        if event.type == resolve:
+            aiTurn = False
+            if chessBoard.currentPlayer == "White":
+                chessBoard.currentPlayer = "Black"
+                chessBoard.prevBoard.currentPlayer = "White"
+                aiTurn = True
+            else:
+                chessBoard.currentPlayer = "White"
+                chessBoard.prevBoard.currentPlayer = "Black"
+                chessBoard.moveCounter += 1
+
+            for piece in allPieces:
+                if piece[2].color == chessBoard.currentPlayer and piece[2].toString().lower() == "k":
+                    friendlyKing = piece[2]
+                    # print("King Legal Moves:", friendlyKing.legalMoves(chessBoard))
+                    if friendlyKing.inCheck(chessBoard):
+                        print("Check")
+                        if friendlyKing.inCheckmate(chessBoard):
+                            p.event.post(checkmateOccured)
+                            break
+
+                    elif friendlyKing.inStalemate(chessBoard):
+                        p.event.post(stalemateOccured)
+                        break
+                    break
+            if aiTurn:
+                p.event.post(aiMoves)
     for tile in allTiles:
         p.draw.rect(game, tile[0], tile[1])
     for img in allPieces:
         game.blit(img[0], img[1])
     p.display.update()
-    clock.tick(60)
+    clock.tick(40)
 
 
 

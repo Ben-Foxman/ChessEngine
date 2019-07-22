@@ -16,6 +16,7 @@ class Board:
         for x in range(64):
             self.tiles[x] = (Tile(x, NullPiece()))
         for x in range(8, 16):
+            pass
             self.tiles[x] = (Tile(x, Pawn("White", x)))
         for x in range(48, 56):
             self.tiles[x] = (Tile(x, Pawn("Black", x)))
