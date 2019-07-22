@@ -44,28 +44,46 @@ class Board:
                 print("|", end=self.tiles[8 * (7 - x) + y].pieceOnTile.toString())
             print("|")
 
-    def allEnemyAttacks(self, prevBoard):
+    def allEnemyAttacks(self):
         allEnemyAttacks = []
         for tile in self.tiles.values():
             if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color != self.currentPlayer:
                 if tile.pieceOnTile.toString().lower() == "k":
-                    allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.rawMoves(self, prevBoard)
-                elif tile.pieceOnTile.legalMoves(self, prevBoard) is not None:
+                    allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.rawMoves(self)
+                elif tile.pieceOnTile.legalMoves(self) is not None:
                     if tile.pieceOnTile.toString().lower() == "p":
-                        allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.possibleCaptures(self, prevBoard)
+                        allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.possibleCaptures(self)
                     else:
-                        allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.legalMoves(self, prevBoard)
+                        allEnemyAttacks = allEnemyAttacks + tile.pieceOnTile.legalMoves(self)
         return allEnemyAttacks
 
-    def allFriendlyAttacks(self, prevBoard):
+    def allFriendlyAttacks(self):
         allFriendlyAttacks = []
         for tile in self.tiles.values():
-            if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color == self.currentPlayer:
+            if tile.pieceOnTile.color == self.currentPlayer:
                 if tile.pieceOnTile.toString().lower() == "k":
-                    allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.rawMoves(self, prevBoard)
-                elif tile.pieceOnTile.legalMoves(self, prevBoard) is not None:
+                    allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.rawMoves(self)
+                elif tile.pieceOnTile.legalMoves(self) is not None:
                     if tile.pieceOnTile.toString().lower() == "p":
-                        allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.possibleCaptures(self, prevBoard)
+                        allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.possibleCaptures(self)
                     else:
-                        allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.legalMoves(self, prevBoard)
+                        allFriendlyAttacks = allFriendlyAttacks + tile.pieceOnTile.legalMoves(self)
         return allFriendlyAttacks
+
+    def allFriendlyPieces(self):
+        allFriendlyPieces = []
+        for tile in self.tiles.values():
+            if tile.pieceOnTile.color == self.currentPlayer:
+                allFriendlyPieces.append(tile.pieceOnTile)
+        return allFriendlyPieces
+
+    def allFriendlyMoves(self):
+        moves = []
+        for piece in self.allFriendlyPieces():
+            if piece.color == self.currentPlayer:
+                if piece.legalMoves(self) is not None:
+                    moves = moves + piece.legalMoves(self)
+        return moves
+
+
+

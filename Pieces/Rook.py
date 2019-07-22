@@ -10,7 +10,7 @@ class Rook(Piece):
     def toString(self):
         return "R" if self.color == "Black" else "r"
 
-    def legalMoves(self, board, prevBoard):
+    def legalMoves(self, board):
         destinations = []
         startingCoordinate = self.position
         # Up

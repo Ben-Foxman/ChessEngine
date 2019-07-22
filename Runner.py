@@ -1,7 +1,7 @@
 import pygame as p
 from Game.Board import Board
 from Game.Move import Move
-from Engine.BoardEvaluator import evalBoard
+from Engine.Positions import *
 import math
 import copy
 import time
@@ -17,16 +17,15 @@ clock = p.time.Clock()
 
 
 selectedPiece = None
-prevBoard = None
 chessBoard = Board()
-
-
 allTiles = []
 allPieces = []
 checkmate = p.USEREVENT + 1
 stalemate = p.USEREVENT + 2
+aiMove = p.USEREVENT + 3
 checkmateOccured = p.event.Event(checkmate)
 stalemateOccured = p.event.Event(stalemate)
+aiMoves = p.event.Event(aiMove)
 
 
 
@@ -66,7 +65,6 @@ def drawSquares(x, y, w, h, color):
     p.draw.rect(game, color, [x, y, w, h])
     allTiles.append([color, [x, y, w, h]])
 
-
 def updateChessPieces():
     xPos = 0
     yPos = 700
@@ -91,10 +89,10 @@ def updateChessPieces():
 
 
 
+
 gameOver = False
 px, py = 0, 0
 drawPieces()
-
 while not gameOver:
 
     for event in p.event.get():
@@ -107,7 +105,8 @@ while not gameOver:
 
         if event.type == checkmate:
             checkmateText1 = font.render(("Checkmate!"), True, (143, 32, 67))
-            checkmateText2 = font.render((str(chessBoard.previousPlayer) + " Wins!"), True, (143, 32, 67))
+
+            checkmateText2 = font.render((str(chessBoard.currentPlayer) + " Wins!"), True, (143, 32, 67))
             checkmateRect1 = checkmateText1.get_rect()
             checkmateRect2 = checkmateText2.get_rect()
             checkmateRect1.center = (900, 100)
@@ -125,6 +124,26 @@ while not gameOver:
             stalemateRect = stalemateText.get_rect()
             stalemateRect.center = (900, 100)
             game.blit(stalemateText, stalemateRect)
+
+
+        if event.type == aiMove:
+            # chessBoard.printBoard()
+                    # print(move)
+            #print("The Chess Board")
+            #chessBoard.printBoard()
+            prevBoard = chessBoard
+            # x = 0
+
+            chessBoard = getNewBoard(chessBoard)
+            chessBoard.prevBoard = copy.deepcopy(prevBoard)
+            allPieces = updateChessPieces()
+            #chessBoard.prevBoard.printBoard()
+            #chessBoard.printBoard()
+
+            # print("Move Counter: " ,chessBoard.moveCounter)
+            # print("Current Player: " ,chessBoard.currentPlayer)
+
+
 
 
 
@@ -156,71 +175,81 @@ while not gameOver:
                 legal = False
                 xCoor = int(math.floor((selectedPiece[1][0] + 50) / 100.0) * 100)
                 yCoor = 700 - int(math.floor((selectedPiece[1][1] + 50) / 100.0) * 100)
-                for desiredMove in selectedPiece[2].legalMoves(chessBoard, prevBoard):
+                for desiredMove in selectedPiece[2].legalMoves(chessBoard):
                     if desiredMove == xCoor / 100 + 8 * yCoor /100:
                         theMove = desiredMove
                         legal = True
-                        selectedPiece[1][0] = xCoor
-                        selectedPiece[1][1] = 700 - yCoor
                         break
 
 
                 # drawPieces()
 
-                hold = selectedPiece[2].position
-                if legal:
-                    move = Move(chessBoard, selectedPiece[2], theMove)
-                    newBoard = move.makeMove()
-                    selectedPiece[2].position = theMove
-
-                friendlyKing = None
-                for tile in chessBoard.tiles.values():
-                    if (tile.pieceOnTile.toString() == "K" and chessBoard.currentPlayer == "Black") or (
-                            tile.pieceOnTile.toString() == "k" and chessBoard.currentPlayer == "White"):
-                        friendlyKing = tile.pieceOnTile
-                        break
                 # print("Current Turn:",chessBoard.currentPlayer)
                 # print("Move is Legal:", legal)
                 # print("Move results in friendly king being in check:", friendlyKing.inCheck(newBoard, chessBoard))
                 # newBoard.printBoard()
-                if not legal or (friendlyKing.inCheck(newBoard, chessBoard)):
+                if not legal:
                     selectedPiece[1][0] = px
                     selectedPiece[1][1] = py
-                    selectedPiece[2].position = hold
+                    selectedPiece = None
                 else:
-                    prevBoard = copy.deepcopy(chessBoard)
-                    chessBoard = copy.deepcopy(newBoard)
-                    chessBoard.prevBoard = copy.deepcopy(prevBoard)
-                    allPieces = updateChessPieces()
-                    chessBoard.prevBoard.printBoard()
-                    print(round(evalBoard(chessBoard), 2))
-                    #post selection
-                    if chessBoard.currentPlayer == "White":
-                        chessBoard.currentPlayer = "Black"
-                        chessBoard.previousPlayer = "White"
-                    else:
-                        chessBoard.currentPlayer = "White"
-                        chessBoard.previousPlayer = "Black"
-                        chessBoard.moveCounter += 1
+                    selectedPiece[1][0] = xCoor
+                    selectedPiece[1][1] = 700 - yCoor
+                    move = Move(chessBoard, selectedPiece[2], theMove)
+                    newBoard = move.makeMove()
+                    if not newBoard == False:
+                        prevBoard = chessBoard
+                        for tile in prevBoard.tiles.values():
+                            if selectedPiece[2].position == tile.coordinate:
+                                tile.pieceOnTile = copy.deepcopy(selectedPiece[2])
 
-                    for piece in allPieces:
-                        if piece[2].color == chessBoard.currentPlayer and piece[2].toString().lower() == "k":
-                            if piece[2].inCheck(chessBoard, prevBoard):
-                                if piece[2].inCheckmate(chessBoard, prevBoard):
-                                    p.event.post(checkmateOccured)
+                        selectedPiece[2].position = theMove
+                        chessBoard = newBoard
+                        chessBoard.prevBoard = copy.deepcopy(prevBoard)
+                        allPieces = updateChessPieces()
+                        if chessBoard.moveCounter == 3:
+                            print()
+                        #prevPiece = selectedPiece
+                        #selectedPiece[2].position = hold
+
+
+
+
+
+
+
+
+
+                        #post selection
+                        if chessBoard.currentPlayer == "White":
+                            chessBoard.currentPlayer = "Black"
+                            chessBoard.prevBoard.currentPlayer = "White"
+                            p.event.post(aiMoves)
+                        else:
+                            chessBoard.currentPlayer = "White"
+                            chessBoard.prevBoard.currentPlayer = "Black"
+                            chessBoard.moveCounter += 1
+
+                        for piece in allPieces:
+                            if piece[2].color == chessBoard.currentPlayer and piece[2].toString().lower() == "k":
+                                if piece[2].inCheck(chessBoard):
+                                    if piece[2].inCheckmate(chessBoard):
+                                        p.event.post(checkmateOccured)
+                                        break
+
+                                elif piece[2].inStalemate(chessBoard):
+                                    p.event.post(stalemateOccured)
                                     break
-
-                            elif piece[2].inStalemate(chessBoard, prevBoard):
-                                p.event.post(stalemateOccured)
                                 break
-                            break
-                selectedPiece = None
 
+
+                    selectedPiece = None
     for tile in allTiles:
         p.draw.rect(game, tile[0], tile[1])
     for img in allPieces:
         game.blit(img[0], img[1])
     p.display.update()
     clock.tick(60)
+
 
 

@@ -9,7 +9,7 @@ class Bishop(Piece):
     def toString(self):
         return "B" if self.color == "Black" else "b"
 
-    def legalMoves(self, board, prevBoard):
+    def legalMoves(self, board, ):
         destinations = []
         startingCoordinate = self.position
         # Up Left

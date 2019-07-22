@@ -9,7 +9,7 @@ class Queen(Piece):
     def toString(self):
         return "Q" if self.color == "Black" else "q"
 
-    def legalMoves(self, board, prevBoard):
+    def legalMoves(self, board):
         destinations = []
         startingCoordinate = self.position
         # Up Left

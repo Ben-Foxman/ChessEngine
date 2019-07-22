@@ -11,7 +11,7 @@ class King(Piece):
     def toString(self):
         return "K" if self.color == "Black" else "k"
 
-    def legalMoves(self, board, prevBoard):
+    def legalMoves(self, board):
         destinations = []
         startingCoordinate = self.position
         # Up Left
@@ -137,7 +137,7 @@ class King(Piece):
 
         startingCoordinate = self.position
         destinations = list(filter(lambda x: x != startingCoordinate, destinations))
-        allEnemyAttacks = board.allEnemyAttacks(prevBoard)
+        allEnemyAttacks = board.allEnemyAttacks()
 
 
         # deal with castling
@@ -176,11 +176,11 @@ class King(Piece):
         for move in moves:
             copyBoard = copy.deepcopy(board)
             copyBoard.tiles[move] = Tile(move, NullPiece())
-            allEnemyAttacks = copyBoard.allEnemyAttacks(prevBoard)
+            allEnemyAttacks = copyBoard.allEnemyAttacks()
             if move in allEnemyAttacks:
                 moves.remove(move)
         return moves
-    def rawMoves(self, board, prevBoard):
+    def rawMoves(self, board):
         destinations = []
         startingCoordinate = self.position
         # Up Left
@@ -308,16 +308,16 @@ class King(Piece):
         destinations = list(filter(lambda x: x != startingCoordinate, destinations))
 
         return destinations
-    def inCheck(self, board, prevBoard):
-        allEnemyAttacks = board.allEnemyAttacks(prevBoard)
+    def inCheck(self, board):
+        allEnemyAttacks = board.allEnemyAttacks()
         return self.position in allEnemyAttacks
 
-    def inCheckmate(self, board, prevBoard):
-        moves = self.legalMoves(board, prevBoard)
+    def inCheckmate(self, board):
+        moves = self.legalMoves(board)
         for move in moves:
             copyBoard = copy.deepcopy(board)
             copyBoard.tiles[move] = Tile(move, NullPiece())
-            allEnemyAttacks = copyBoard.allEnemyAttacks(prevBoard)
+            allEnemyAttacks = copyBoard.allEnemyAttacks()
             if move in allEnemyAttacks:
                 moves.remove(move)
 
@@ -327,18 +327,18 @@ class King(Piece):
             if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color == self.color:
                 if tile.pieceOnTile.toString().lower() != "k":
                     allFriendlyPieces.append(tile.pieceOnTile)
-                if tile.pieceOnTile.legalMoves(board, prevBoard) is not None:
-                    allFriendlyMoves = allFriendlyMoves + tile.pieceOnTile.legalMoves(board, prevBoard)
+                if tile.pieceOnTile.legalMoves(board) is not None:
+                    allFriendlyMoves = allFriendlyMoves + tile.pieceOnTile.legalMoves(board)
 
 
         for piece in allFriendlyPieces:
-            legalMoves = piece.legalMoves(board, prevBoard)
+            legalMoves = piece.legalMoves(board)
             if legalMoves is not None:
                 for move in legalMoves:
                     copyBoard = copy.deepcopy(board)
                     copyBoard.tiles[piece.position] = Tile(piece.position, NullPiece())
                     copyBoard.tiles[move] = Tile(move, piece)
-                    if not self.inCheck(copyBoard, board):
+                    if not self.inCheck(copyBoard):
                         return False
 
         copyBoard = copy.deepcopy(board)
@@ -348,16 +348,15 @@ class King(Piece):
                 copyBoard.tiles[number] = Tile(number, NullPiece())
 
 
-        copyBoard.printBoard()
-        return not moves and self.inCheck(copyBoard, board) # and self.inCheck(copyBoard, prevBoard)
+        return not moves and self.inCheck(copyBoard) # and self.inCheck(copyBoard, )
 
 
 
-    def inStalemate(self, board, prevBoard):
+    def inStalemate(self, board):
         allFriendlyMoves = []
         for tile in board.tiles.values():
             if tile.pieceOnTile.toString() != "-" and tile.pieceOnTile.color == self.color:
-                if tile.pieceOnTile.legalMoves(board, prevBoard) is not None:
-                    allFriendlyMoves = allFriendlyMoves + tile.pieceOnTile.legalMoves(board, prevBoard)
-        return not allFriendlyMoves and not self.inCheck(board, prevBoard)
+                if tile.pieceOnTile.legalMoves(board) is not None:
+                    allFriendlyMoves = allFriendlyMoves + tile.pieceOnTile.legalMoves(board)
+        return not allFriendlyMoves and not self.inCheck(board)
 

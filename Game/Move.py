@@ -76,7 +76,14 @@ class Move:
         if not specialMove:
             boardCopy.tiles[self.coordinate] = Tile(self.coordinate, self.piece)
 
-
+        friendlyKing = None
+        for tile in boardCopy.tiles.values():
+            if (tile.pieceOnTile.toString() == "K" and boardCopy.currentPlayer == "Black") or (
+                    tile.pieceOnTile.toString() == "k" and boardCopy.currentPlayer == "White"):
+                friendlyKing = tile.pieceOnTile
+                break
+        if friendlyKing.inCheck(boardCopy):
+            return False
         return boardCopy
 
 

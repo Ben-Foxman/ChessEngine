@@ -11,7 +11,7 @@ class Knight(Piece):
     def toString(self):
         return "N" if self.color == "Black" else "n"
 
-    def legalMoves(self, board, prevBoard):
+    def legalMoves(self, board):
         destinations = []
         startingCoordinate = self.position
         # NNE move
