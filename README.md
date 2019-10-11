@@ -1,2 +1,2 @@
 # ChessEngine
-Engine that "Plays" Chess
+My attempt to make a chess engine.
